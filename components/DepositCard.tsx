@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAccount, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useReadContracts, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { CONTRACTS, ERC20_ABI, TELLER_ABI } from '@/lib/contracts'
 import { formatBalance, parseInputAmount } from '@/lib/utils'
 import { arcTestnet } from '@/lib/chain'
@@ -15,6 +15,22 @@ export function DepositCard() {
   const [errorMsg, setErrorMsg] = useState('')
 
   const isWrongNetwork = isConnected && chainId !== arcTestnet.id
+
+  const { data: allowlistData } = useReadContract({
+    address: CONTRACTS.ROLES_AUTHORITY,
+    abi: [{
+      name: 'doesUserHaveRole',
+      type: 'function',
+      stateMutability: 'view',
+      inputs: [{ name: 'user', type: 'address' }, { name: 'role', type: 'uint8' }],
+      outputs: [{ name: '', type: 'bool' }],
+    }] as const,
+    functionName: 'doesUserHaveRole',
+    args: [address ?? '0x0000000000000000000000000000000000000000', 0],
+    query: { enabled: isConnected && !!address },
+  })
+
+  const isAllowlisted = allowlistData === true
 
   const { data, refetch } = useReadContracts({
     contracts: [
@@ -177,6 +193,26 @@ export function DepositCard() {
         <p className="text-arc-muted text-sm mt-1">Deposit USDC to receive USYC and earn U.S. Treasury yield</p>
       </div>
 
+      {allowlistData !== undefined && (
+        <div className={`rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-medium ${
+          isAllowlisted
+            ? 'bg-arc-green/10 border border-arc-green/30 text-arc-green'
+            : 'bg-red-500/10 border border-red-500/30 text-red-400'
+        }`}>
+          <span>{isAllowlisted ? '✅' : '🚫'}</span>
+          {isAllowlisted
+            ? 'Wallet is allowlisted — you can deposit'
+            : (
+              <span>
+                Wallet not allowlisted.{' '}
+                <a href="https://support.circle.com/" target="_blank" rel="noopener noreferrer"
+                  className="underline hover:opacity-80">Request access →</a>
+              </span>
+            )
+          }
+        </div>
+      )}
+
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <label className="label">Amount (USDC)</label>
@@ -256,7 +292,7 @@ export function DepositCard() {
           <button
             className="btn-primary w-full"
             onClick={handleApprove}
-            disabled={!parsedAmount || !hasEnoughBalance || isLoading}
+            disabled={!parsedAmount || !hasEnoughBalance || isLoading || !isAllowlisted}
           >
             {isLoading && step === 'approving' ? (
               <span className="flex items-center justify-center gap-2">
@@ -270,7 +306,7 @@ export function DepositCard() {
           <button
             className="btn-primary w-full"
             onClick={handleDeposit}
-            disabled={!parsedAmount || !hasEnoughBalance || isLoading}
+            disabled={!parsedAmount || !hasEnoughBalance || isLoading || !isAllowlisted}
           >
             {isLoading && step === 'depositing' ? (
               <span className="flex items-center justify-center gap-2">
