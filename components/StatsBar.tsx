@@ -1,16 +1,24 @@
 'use client'
 
 import { useReadContracts } from 'wagmi'
-import { CONTRACTS, ORACLE_ABI } from '@/lib/contracts'
+import { CONTRACTS, ORACLE_ABI, USE_VAULT, SHARE_TOKEN_NAME } from '@/lib/contracts'
 import { formatPrice } from '@/lib/utils'
+
+const VAULT_ORACLE_ABI = [{
+  name: 'latestAnswer',
+  type: 'function',
+  stateMutability: 'view',
+  inputs: [],
+  outputs: [{ name: '', type: 'int256' }],
+}] as const
 
 export function StatsBar() {
   const { data } = useReadContracts({
     contracts: [
       {
         address: CONTRACTS.USYC_ORACLE,
-        abi: ORACLE_ABI,
-        functionName: 'latestAnswer',
+        abi: USE_VAULT ? VAULT_ORACLE_ABI : ORACLE_ABI,
+        functionName: USE_VAULT ? 'latestAnswer' : 'latestRoundData',
       },
       {
         address: CONTRACTS.USYC_ORACLE,
@@ -20,18 +28,25 @@ export function StatsBar() {
     ],
   })
 
-  const rawPrice = data?.[0]?.result as bigint | undefined
-  const oracleDecimals = data?.[1]?.result as number | undefined
+  let rawPrice: bigint | undefined
+  if (USE_VAULT) {
+    rawPrice = data?.[0]?.result as bigint | undefined
+  } else {
+    const roundData = data?.[0]?.result as readonly [bigint, bigint, bigint, bigint, bigint] | undefined
+    rawPrice = roundData?.[1]
+  }
+
+  const oracleDecimals = (data?.[1]?.result as number | undefined) ?? 6
 
   const priceDisplay =
-    rawPrice !== undefined && oracleDecimals !== undefined
-      ? formatPrice(rawPrice > 0n ? rawPrice : undefined, oracleDecimals)
+    rawPrice !== undefined && rawPrice > 0n
+      ? formatPrice(rawPrice, oracleDecimals)
       : '—'
 
   const stats = [
     {
-      label: 'USYC Price',
-      value: rawPrice !== undefined ? `$${priceDisplay}` : '...',
+      label: `${SHARE_TOKEN_NAME} Price`,
+      value: rawPrice !== undefined && rawPrice > 0n ? `$${priceDisplay}` : '...',
       sub: 'vs USDC',
       color: 'text-arc-green',
     },
