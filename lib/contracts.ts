@@ -1,10 +1,29 @@
-export const CONTRACTS = {
+// ─── Switch between USYC (allowlist required) and SimpleYieldVault (no allowlist) ───
+// After deploying contracts/src/SimpleYieldVault.sol, paste the address below
+// and set USE_VAULT = true
+const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000' as `0x${string}`
+export const USE_VAULT = false // ← change to true after deployment
+
+const USYC_CONTRACTS = {
   USDC: '0x3600000000000000000000000000000000000000' as `0x${string}`,
   USYC: '0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C' as `0x${string}`,
   USYC_TELLER: '0x9fdF14c5B14173D74C08Af27AebFf39240dC105A' as `0x${string}`,
   USYC_ORACLE: '0x0f30ebeb58ef91b0a82408941eab8e7dd1be1097' as `0x${string}`,
   ROLES_AUTHORITY: '0xcc205224862c7641930c87679e98999d23c26113' as `0x${string}`,
-} as const
+}
+
+const VAULT_CONTRACTS = {
+  USDC: '0x3600000000000000000000000000000000000000' as `0x${string}`,
+  USYC: VAULT_ADDRESS,          // vault IS the share token
+  USYC_TELLER: VAULT_ADDRESS,   // vault IS the teller
+  USYC_ORACLE: VAULT_ADDRESS,   // vault has latestAnswer()
+  ROLES_AUTHORITY: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+}
+
+export const CONTRACTS = USE_VAULT ? VAULT_CONTRACTS : USYC_CONTRACTS
+
+export const SHARE_TOKEN_NAME = USE_VAULT ? 'yUSDC' : 'USYC'
+export const REQUIRES_ALLOWLIST = !USE_VAULT ? true : false
 
 export const ERC20_ABI = [
   {

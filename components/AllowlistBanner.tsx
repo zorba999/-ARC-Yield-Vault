@@ -1,6 +1,10 @@
 'use client'
 
+import { REQUIRES_ALLOWLIST } from '@/lib/contracts'
+
 export function AllowlistBanner() {
+  if (!REQUIRES_ALLOWLIST) return null
+
   return (
     <div className="border border-yellow-500/30 bg-yellow-500/10 rounded-2xl p-4 flex items-start gap-3">
       <div className="text-yellow-400 text-lg mt-0.5">⚠️</div>

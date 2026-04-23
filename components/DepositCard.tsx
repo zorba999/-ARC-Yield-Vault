@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAccount, useReadContracts, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { CONTRACTS, ERC20_ABI, TELLER_ABI } from '@/lib/contracts'
+import { CONTRACTS, ERC20_ABI, TELLER_ABI, REQUIRES_ALLOWLIST, SHARE_TOKEN_NAME, USE_VAULT } from '@/lib/contracts'
 import { formatBalance, parseInputAmount } from '@/lib/utils'
 import { arcTestnet } from '@/lib/chain'
 
@@ -27,10 +27,10 @@ export function DepositCard() {
     }] as const,
     functionName: 'doesUserHaveRole',
     args: [address ?? '0x0000000000000000000000000000000000000000', 0],
-    query: { enabled: isConnected && !!address },
+    query: { enabled: isConnected && !!address && REQUIRES_ALLOWLIST },
   })
 
-  const isAllowlisted = allowlistData === true
+  const isAllowlisted = REQUIRES_ALLOWLIST ? allowlistData === true : true
 
   const { data, refetch } = useReadContracts({
     contracts: [
@@ -190,7 +190,7 @@ export function DepositCard() {
     <div className="card p-6 flex flex-col gap-5">
       <div>
         <h2 className="text-arc-text font-bold text-lg">Deposit USDC</h2>
-        <p className="text-arc-muted text-sm mt-1">Deposit USDC to receive USYC and earn U.S. Treasury yield</p>
+        <p className="text-arc-muted text-sm mt-1">Deposit USDC to receive {SHARE_TOKEN_NAME} and earn U.S. Treasury yield</p>
       </div>
 
       {allowlistData !== undefined && (
@@ -241,10 +241,10 @@ export function DepositCard() {
         </div>
         <div className="flex justify-between">
           <span className="text-arc-muted">You receive (approx)</span>
-          <span className="text-arc-green font-medium">≈ {amount || '0'} USYC*</span>
+          <span className="text-arc-green font-medium">≈ {amount || '0'} {SHARE_TOKEN_NAME}*</span>
         </div>
         <p className="text-arc-muted/60 text-xs">* Exact amount depends on current USYC/USDC exchange rate</p>
-        <p className="text-yellow-500/80 text-xs">⚠ Max deposit: 100 USDC/day (daily limit per wallet)</p>
+        {!USE_VAULT && <p className="text-yellow-500/80 text-xs">⚠ Max deposit: 100 USDC/day (USYC daily limit)</p>}
       </div>
 
       {errorMsg && (
