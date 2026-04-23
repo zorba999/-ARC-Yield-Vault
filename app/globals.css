@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: #080b12;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer utilities {
+  .card {
+    @apply bg-arc-card border border-arc-border rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply bg-arc-blue hover:bg-arc-blue-light text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-arc-subtle hover:bg-arc-border text-arc-text font-semibold py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full bg-arc-bg border border-arc-border rounded-xl px-4 py-3 text-arc-text placeholder:text-arc-muted focus:outline-none focus:border-arc-blue transition-colors;
+  }
+
+  .label {
+    @apply text-arc-muted text-sm font-medium;
+  }
+}
