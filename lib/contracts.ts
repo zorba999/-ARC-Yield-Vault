@@ -1,8 +1,8 @@
 // ─── Switch between USYC (allowlist required) and SimpleYieldVault (no allowlist) ───
 // After deploying contracts/src/SimpleYieldVault.sol, paste the address below
 // and set USE_VAULT = true
-const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000' as `0x${string}`
-export const USE_VAULT = false // ← change to true after deployment
+const VAULT_ADDRESS = '0x53A65102aD0630e9811eFF6900e841435aAB0c33' as `0x${string}`
+export const USE_VAULT = true // SimpleYieldVault — no allowlist required
 
 const USYC_CONTRACTS = {
   USDC: '0x3600000000000000000000000000000000000000' as `0x${string}`,
