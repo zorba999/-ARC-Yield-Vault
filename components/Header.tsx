@@ -1,48 +1,51 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount } from 'wagmi'
-import { arcTestnet } from '@/lib/chain'
-import { shortenAddress } from '@/lib/utils'
 
 export function Header() {
-  const { address, isConnected } = useAccount()
-
   return (
-    <header className="border-b border-arc-border bg-arc-card/60 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-arc-blue flex items-center justify-center text-white font-bold text-sm">
-            A
+    <header className="app-header">
+      <div className="header-inner">
+        <div className="logo">
+          <div className="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 20 L12 4 L20 20" />
+              <path d="M7.5 14 L16.5 14" />
+            </svg>
           </div>
-          <div>
-            <h1 className="text-arc-text font-bold text-lg leading-none">ARC Yield Vault</h1>
-            <p className="text-arc-muted text-xs mt-0.5">Powered by USYC on ARC Testnet</p>
+          <div className="logo-text">
+            <span className="arc">ARC</span>
+            <span className="sub">Yield Vault</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <a
-            href="https://testnet.arcscan.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 text-arc-muted hover:text-arc-text text-sm transition-colors"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-arc-green animate-pulse" />
-            {arcTestnet.name}
-          </a>
+        <div className="header-right">
+          <span className="net-pill">
+            <span className="dot-live" />
+            ARC Testnet · 5042002
+          </span>
 
-          {isConnected && address && (
-            <span className="hidden md:block text-arc-muted text-xs font-mono bg-arc-subtle border border-arc-border px-3 py-1.5 rounded-lg">
-              {shortenAddress(address)}
-            </span>
-          )}
-
-          <ConnectButton
-            accountStatus="avatar"
-            chainStatus="icon"
-            showBalance={false}
-          />
+          <ConnectButton.Custom>
+            {({ account, chain, openAccountModal, openConnectModal, mounted }) => {
+              const connected = mounted && account && chain
+              return (
+                <div style={!mounted ? { opacity: 0, pointerEvents: 'none' as const } : {}}>
+                  {!connected ? (
+                    <button onClick={openConnectModal} className="connect-btn">
+                      <span className="glow" />
+                      Connect Wallet
+                    </button>
+                  ) : (
+                    <button onClick={openAccountModal} className="connect-btn connected">
+                      <span className="glow" />
+                      <span className="avatar-dot" />
+                      {account.displayName}
+                    </button>
+                  )}
+                </div>
+              )
+            }}
+          </ConnectButton.Custom>
         </div>
       </div>
     </header>

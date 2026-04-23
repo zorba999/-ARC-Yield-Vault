@@ -35,50 +35,32 @@ export function StatsBar() {
     const roundData = data?.[0]?.result as readonly [bigint, bigint, bigint, bigint, bigint] | undefined
     rawPrice = roundData?.[1]
   }
-
   const oracleDecimals = (data?.[1]?.result as number | undefined) ?? 6
-
-  const priceDisplay =
-    rawPrice !== undefined && rawPrice > 0n
-      ? formatPrice(rawPrice, oracleDecimals)
-      : '—'
-
-  const stats = [
-    {
-      label: `${SHARE_TOKEN_NAME} Price`,
-      value: rawPrice !== undefined && rawPrice > 0n ? `$${priceDisplay}` : '...',
-      sub: 'vs USDC',
-      color: 'text-arc-green',
-    },
-    {
-      label: 'Yield Source',
-      value: 'US Treasuries',
-      sub: 'Overnight repo rate',
-      color: 'text-arc-blue-light',
-    },
-    {
-      label: 'Network',
-      value: 'ARC Testnet',
-      sub: 'Chain ID: 5042002',
-      color: 'text-arc-text',
-    },
-    {
-      label: 'Settlement',
-      value: '< 1 second',
-      sub: 'Deterministic finality',
-      color: 'text-arc-green',
-    },
-  ]
+  const priceDisplay = rawPrice !== undefined && rawPrice > 0n ? formatPrice(rawPrice, oracleDecimals) : '—'
+  const priceValue = rawPrice !== undefined && rawPrice > 0n ? `$${priceDisplay}` : '...'
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {stats.map((stat) => (
-        <div key={stat.label} className="card px-4 py-3">
-          <p className="label">{stat.label}</p>
-          <p className={`font-bold text-base mt-1 ${stat.color}`}>{stat.value}</p>
-          <p className="text-arc-muted text-xs mt-0.5">{stat.sub}</p>
-        </div>
-      ))}
+    <div className="stats">
+      <div className="card stat price">
+        <div className="slabel"><span className="dot-live" />{SHARE_TOKEN_NAME} Price</div>
+        <div className="value mono" style={{ color: 'var(--green-2)' }}>{priceValue}</div>
+        <div className="sub">vs USDC</div>
+      </div>
+      <div className="card stat yield">
+        <div className="slabel">Yield Source</div>
+        <div className="value">US Treasuries</div>
+        <div className="sub">Overnight repo rate</div>
+      </div>
+      <div className="card stat network">
+        <div className="slabel">Network</div>
+        <div className="value">ARC Testnet</div>
+        <div className="sub mono">Chain ID · 5042002</div>
+      </div>
+      <div className="card stat settle">
+        <div className="slabel">Settlement</div>
+        <div className="value mono">&lt; 1 second</div>
+        <div className="sub">Deterministic finality</div>
+      </div>
     </div>
   )
 }

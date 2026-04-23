@@ -93,128 +93,167 @@ export function RedeemCard() {
   }
 
   const isLoading = isWritePending || isTxLoading
+  const amountNum = parseFloat(amount) || 0
 
-  if (!isConnected) {
+  if (!isConnected || isWrongNetwork) {
     return (
-      <div className="card p-6 flex flex-col items-center justify-center gap-3 min-h-[300px]">
-        <p className="text-4xl">🔌</p>
-        <p className="text-arc-muted text-center">Connect your wallet to redeem USYC</p>
-      </div>
-    )
-  }
-
-  if (isWrongNetwork) {
-    return (
-      <div className="card p-6 flex flex-col items-center justify-center gap-3 min-h-[300px]">
-        <p className="text-4xl">⛓️</p>
-        <p className="text-arc-text font-semibold">Wrong Network</p>
-        <p className="text-arc-muted text-sm text-center">
-          Switch to <strong className="text-arc-blue">ARC Testnet</strong> (Chain ID: 5042002)
-        </p>
+      <div className="card action-card">
+        <div className="action-head">
+          <h3>
+            <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="#ffa38e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+            </svg>
+            Redeem
+          </h3>
+          <span className="tag">yUSDC → USDC</span>
+        </div>
+        <div className="disconnected-placeholder">
+          <div className="lock-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            </svg>
+          </div>
+          <p style={{ color: 'var(--text)', fontWeight: 600 }}>{isWrongNetwork ? 'Wrong Network' : 'Connect wallet to redeem'}</p>
+          <p style={{ color: 'var(--muted)', fontSize: 13, textAlign: 'center' }}>
+            {isWrongNetwork ? 'Switch to ARC Testnet (Chain ID: 5042002)' : 'Connect your wallet to redeem yUSDC for USDC'}
+          </p>
+        </div>
       </div>
     )
   }
 
   if (step === 'done') {
     return (
-      <div className="card p-6 flex flex-col items-center justify-center gap-4 min-h-[300px]">
-        <div className="w-14 h-14 rounded-full bg-arc-green/20 flex items-center justify-center text-2xl">💰</div>
-        <p className="text-arc-green font-bold text-lg">Redeem Successful!</p>
-        <p className="text-arc-muted text-sm text-center">USDC has been returned to your wallet.</p>
-        {txHash && (
-          <a
-            href={`https://testnet.arcscan.app/tx/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-arc-blue hover:underline text-sm"
-          >
-            View on ArcScan →
-          </a>
-        )}
-        <button onClick={handleReset} className="btn-primary mt-2 w-full">
-          Redeem Again
-        </button>
+      <div className="card action-card">
+        <div className="action-head">
+          <h3>
+            <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="#ffa38e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+            </svg>
+            Redeem
+          </h3>
+          <span className="tag">yUSDC → USDC</span>
+        </div>
+        <div className="action-body">
+          <div className="success-state" style={{ background: 'radial-gradient(ellipse at top, rgba(249,112,102,0.12), transparent 60%)' }}>
+            <div className="ring coral">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h4>Redemption complete</h4>
+            <p>USDC has been returned to your wallet.</p>
+            {txHash && (
+              <a className="tx-link" href={`https://testnet.arcscan.app/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
+                <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                {txHash.slice(0, 10)}…{txHash.slice(-6)}
+              </a>
+            )}
+            <div style={{ marginTop: 18 }}>
+              <button className="btn danger" onClick={handleReset} style={{ maxWidth: 240, margin: '0 auto' }}>
+                <span className="shimmer" />Redeem more
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="card p-6 flex flex-col gap-5">
-      <div>
-        <h2 className="text-arc-text font-bold text-lg">Redeem USYC</h2>
-        <p className="text-arc-muted text-sm mt-1">Exchange USYC back to USDC at current market rate</p>
+    <div className="card action-card">
+      <div className="action-head">
+        <h3>
+          <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="#ffa38e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>
+          </svg>
+          Redeem
+        </h3>
+        <span className="tag">yUSDC → USDC</span>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <label className="label">Amount (USYC)</label>
+      <div className="action-body">
+        {/* Input */}
+        <div className="input-wrap">
+          <div className="irow1">
+            <span className="ilbl">You Redeem</span>
+            <span className="ibal">Balance: <b>{formatBalance(usycBalance, usycDecimals, 4)}</b> yUSDC</span>
+          </div>
+          <div className="irow2">
+            <input
+              type="number"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => { setAmount(e.target.value); setStep('idle'); setErrorMsg('') }}
+              min="0"
+              disabled={isLoading}
+            />
+            <button className="max-pill" onClick={() => usycBalance && setAmount(String(Number(usycBalance) / 10 ** usycDecimals))}>MAX</button>
+            <div className="token-chip yusdc"><span className="mini">Y</span>yUSDC</div>
+          </div>
+        </div>
+
+        {/* Preview */}
+        <div className="preview">
+          <div className="prow">
+            <span className="pk">You receive</span>
+            <span className="pv">≈ {amount || '0'} USDC</span>
+          </div>
+          <div className="prow">
+            <span className="pk">Exchange rate</span>
+            <span className="pv">~1 yUSDC = 1.000 USDC</span>
+          </div>
+          <div className="prow">
+            <span className="pk">Network fee</span>
+            <span className="pv">~ $0.0001</span>
+          </div>
+        </div>
+
+        {/* Profit row */}
+        {amountNum > 0 && (
+          <div className="profit">
+            <span className="pk">
+              <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+              </svg>
+              Yield earned on this amount
+            </span>
+            <span className="pv">~5% APY</span>
+          </div>
+        )}
+
+        {/* Error */}
+        {errorMsg && <div className="err-banner">{errorMsg}</div>}
+
+        {/* Pending */}
+        {step === 'redeeming' && isTxLoading && txHash && (
+          <div className="pending-banner">
+            <span>Transaction pending...</span>
+            <a href={`https://testnet.arcscan.app/tx/${txHash}`} target="_blank" rel="noopener noreferrer">View on ArcScan →</a>
+          </div>
+        )}
+
+        {/* Button */}
+        <div style={{ marginTop: 18 }}>
           <button
-            className="text-arc-blue text-xs hover:underline"
-            onClick={() => usycBalance && setAmount(String(Number(usycBalance) / 10 ** usycDecimals))}
+            className="btn danger"
+            onClick={handleRedeem}
+            disabled={!parsedAmount || !hasEnoughBalance || isLoading}
           >
-            Max: {formatBalance(usycBalance, usycDecimals, 4)}
+            {isLoading && step === 'redeeming' ? (
+              <><svg className="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2" fill="none" strokeDasharray="30 20"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.9s" repeatCount="indefinite"/></circle></svg> Redeeming...</>
+            ) : (
+              <><svg className="ic" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg> Redeem yUSDC</>
+            )}
+            <span className="shimmer" />
           </button>
         </div>
-        <input
-          type="number"
-          className="input-field"
-          placeholder="0.0000"
-          value={amount}
-          onChange={(e) => { setAmount(e.target.value); setStep('idle'); setErrorMsg('') }}
-          min="0"
-          disabled={isLoading}
-        />
-      </div>
-
-      <div className="bg-arc-bg border border-arc-border rounded-xl p-3 space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-arc-muted">You redeem</span>
-          <span className="text-arc-text font-medium">{amount || '0'} USYC</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-arc-muted">You receive (approx)</span>
-          <span className="text-arc-blue-light font-medium">≈ {amount || '0'} USDC*</span>
-        </div>
-        <p className="text-arc-muted/60 text-xs">* Exact amount depends on current USYC/USDC exchange rate</p>
-      </div>
-
-      {errorMsg && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-          <p className="text-red-400 text-sm">{errorMsg}</p>
-        </div>
-      )}
-
-      {step === 'redeeming' && isTxLoading && txHash && (
-        <div className="bg-arc-blue/10 border border-arc-blue/30 rounded-xl p-3">
-          <p className="text-arc-blue text-sm">Transaction pending...</p>
-          <a
-            href={`https://testnet.arcscan.app/tx/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-arc-blue/70 hover:underline text-xs"
-          >
-            View on ArcScan →
-          </a>
-        </div>
-      )}
-
-      <div className="space-y-3">
-        <button
-          className="btn-secondary w-full"
-          onClick={handleRedeem}
-          disabled={!parsedAmount || !hasEnoughBalance || isLoading}
-        >
-          {isLoading && step === 'redeeming' ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin">⟳</span> Redeeming...
-            </span>
-          ) : (
-            'Redeem USYC'
-          )}
-        </button>
 
         {!hasEnoughBalance && parsedAmount && (
-          <p className="text-red-400 text-xs text-center">Insufficient USYC balance</p>
+          <p style={{ color: 'var(--coral)', fontSize: 12, marginTop: 8, textAlign: 'center' }}>Insufficient yUSDC balance</p>
         )}
       </div>
     </div>

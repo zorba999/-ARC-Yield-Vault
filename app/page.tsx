@@ -1,5 +1,4 @@
 import { Header } from '@/components/Header'
-import { AllowlistBanner } from '@/components/AllowlistBanner'
 import { StatsBar } from '@/components/StatsBar'
 import { BalanceCards } from '@/components/BalanceCards'
 import { DepositCard } from '@/components/DepositCard'
@@ -7,40 +6,55 @@ import { RedeemCard } from '@/components/RedeemCard'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-arc-bg">
-      <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%)' }} />
-      <Header />
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 relative">
-        <div>
-          <h2 className="text-2xl font-bold text-arc-text">Yield Vault</h2>
-          <p className="text-arc-muted text-sm mt-1">
-            Deposit USDC on ARC Testnet to earn U.S. Treasury yield via USYC — the tokenized money market fund by Hashnote & Circle.
-          </p>
-        </div>
+    <>
+      {/* Animated background */}
+      <div className="bg-layer">
+        <div className="grid-bg" />
+        <div className="orb a" />
+        <div className="orb b" />
+        <div className="orb c" />
+      </div>
 
-        <AllowlistBanner />
+      <Header />
+
+      <main className="app">
+        {/* Hero */}
+        <section className="hero">
+          <div className="eyebrow">
+            <span className="dot-live" />
+            Live on ARC Testnet · deterministic finality &lt; 1s
+          </div>
+          <h1>
+            <span className="grad">Earn U.S. Treasury yield,<br />onchain, on ARC.</span>
+          </h1>
+          <p>
+            Deposit USDC, receive yUSDC — a yield-bearing share that accrues value against
+            the overnight repo rate. No lockups, no intermediaries, redeem anytime.
+          </p>
+        </section>
+
+        {/* Stats */}
         <StatsBar />
+
+        {/* Balances */}
         <BalanceCards />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Actions */}
+        <section className="actions">
           <DepositCard />
           <RedeemCard />
-        </div>
+        </section>
 
-        <footer className="text-center text-arc-muted/50 text-xs pb-4 space-y-1">
-          <p>
-            ARC Testnet • USYC by Hashnote •{' '}
-            <a href="https://docs.arc.network" target="_blank" rel="noopener noreferrer" className="hover:text-arc-muted transition-colors">
-              ARC Docs
-            </a>{' '}
-            •{' '}
-            <a href="https://testnet.arcscan.app" target="_blank" rel="noopener noreferrer" className="hover:text-arc-muted transition-colors">
-              Block Explorer
-            </a>
-          </p>
-          <p>This is a testnet demo. No real funds are at risk.</p>
+        {/* Footer */}
+        <footer className="disclaimer">
+          <span>Testnet deployment · no real value. Yield is simulated for demonstration.</span>
+          <div className="dlinks">
+            <a href="https://docs.arc.network" target="_blank" rel="noopener noreferrer">Docs</a>
+            <a href={`https://testnet.arcscan.app/address/0x53A65102aD0630e9811eFF6900e841435aAB0c33`} target="_blank" rel="noopener noreferrer">Contract</a>
+            <a href="https://testnet.arcscan.app" target="_blank" rel="noopener noreferrer">ArcScan ↗</a>
+          </div>
         </footer>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }

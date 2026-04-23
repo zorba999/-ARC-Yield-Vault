@@ -1,12 +1,16 @@
 'use client'
 
 import { useAccount, useReadContracts } from 'wagmi'
-import { CONTRACTS, ERC20_ABI } from '@/lib/contracts'
+import { CONTRACTS, ERC20_ABI, SHARE_TOKEN_NAME } from '@/lib/contracts'
 import { formatBalance } from '@/lib/utils'
+
+function splitBalance(val: string) {
+  const [int, dec] = val.split('.')
+  return { int: int ?? '0', dec: dec ? `.${dec}` : '' }
+}
 
 export function BalanceCards() {
   const { address, isConnected } = useAccount()
-
   const { data, isLoading, refetch } = useReadContracts({
     contracts: [
       {
@@ -40,83 +44,57 @@ export function BalanceCards() {
   const usycBalance = data?.[2]?.result as bigint | undefined
   const usycDecimals = (data?.[3]?.result as number | undefined) ?? 6
 
-  if (!isConnected) {
-    return (
-      <div className="card px-6 py-8 text-center">
-        <p className="text-arc-muted text-lg">🔌 Connect your wallet to view balances</p>
-        <p className="text-arc-muted/60 text-sm mt-2">Make sure you are on ARC Testnet (Chain ID: 5042002)</p>
-      </div>
-    )
-  }
+  const usdcStr = isConnected ? formatBalance(usdcBalance, usdcDecimals, 2) : '—'
+  const usycStr = isConnected ? formatBalance(usycBalance, usycDecimals, 4) : '—'
+  const usdcParts = splitBalance(usdcStr)
+  const usycParts = splitBalance(usycStr)
+
+  const RefreshIcon = () => (
+    <svg className="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  )
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="card p-5 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">$</div>
-            <span className="label">USDC Balance</span>
+    <div className="balances">
+      {/* USDC */}
+      <div className="card balance">
+        <div className="btop">
+          <div className="tk">
+            <div className="token-logo usdc">$</div>
+            <span className="bname">USDC Balance</span>
           </div>
-          <p className="text-2xl font-bold text-arc-text">
-            {isLoading ? (
-              <span className="text-arc-muted text-base animate-pulse">Loading...</span>
-            ) : (
-              formatBalance(usdcBalance, usdcDecimals, 2)
-            )}
-          </p>
-          <p className="text-arc-muted text-xs mt-1">
-            Available to deposit •{' '}
-            <a
-              href="https://faucet.circle.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-arc-blue hover:underline"
-            >
-              Get testnet USDC
-            </a>
-          </p>
+          <button className="refresh" onClick={() => refetch()} title="Refresh"><RefreshIcon /></button>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="text-arc-muted hover:text-arc-text transition-colors text-xl"
-          title="Refresh"
-        >
-          ↻
-        </button>
+        <div className="big">
+          {usdcParts.int}<span className="dec">{usdcParts.dec}</span>
+        </div>
+        <div className="bfoot">
+          <span className="desc">Available to deposit</span>
+          <a href="https://faucet.circle.com" target="_blank" rel="noopener noreferrer">Get testnet USDC →</a>
+        </div>
       </div>
 
-      <div className="card p-5 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-6 h-6 rounded-full bg-arc-green flex items-center justify-center text-white text-xs font-bold">Y</div>
-            <span className="label">USYC Balance</span>
+      {/* yUSDC */}
+      <div className="card balance">
+        <div className="btop">
+          <div className="tk">
+            <div className="token-logo yusdc">Y</div>
+            <span className="bname">{SHARE_TOKEN_NAME} Balance</span>
           </div>
-          <p className="text-2xl font-bold text-arc-text">
-            {isLoading ? (
-              <span className="text-arc-muted text-base animate-pulse">Loading...</span>
-            ) : (
-              formatBalance(usycBalance, usycDecimals, 4)
-            )}
-          </p>
-          <p className="text-arc-muted text-xs mt-1">
-            Earning U.S. Treasury yield •{' '}
-            <a
-              href="https://usyc.dev.hashnote.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-arc-blue hover:underline"
-            >
-              USYC Portal
-            </a>
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="apy-badge"><span className="d" />~5% APY</span>
+            <button className="refresh" onClick={() => refetch()} title="Refresh"><RefreshIcon /></button>
+          </div>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="text-arc-muted hover:text-arc-text transition-colors text-xl"
-          title="Refresh"
-        >
-          ↻
-        </button>
+        <div className="big">
+          {usycParts.int}<span className="dec">{usycParts.dec}</span>
+        </div>
+        <div className="bfoot">
+          <span className="desc">Earning U.S. Treasury yield</span>
+          <a href="https://testnet.arcscan.app/address/0x53A65102aD0630e9811eFF6900e841435aAB0c33" target="_blank" rel="noopener noreferrer">Vault details →</a>
+        </div>
       </div>
     </div>
   )
